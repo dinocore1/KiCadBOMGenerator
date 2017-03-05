@@ -6,7 +6,9 @@ import java.util.Map;
 
 public class Component {
 
-    private final String ref;
+    public static final String KEY_MPN = "MPN";
+
+    public final String ref;
     String value;
     LibSource libSource;
     Map<String, String> fields = new HashMap<String, String>();
@@ -14,6 +16,11 @@ public class Component {
 
     public Component(String ref) {
         this.ref = ref;
+    }
+
+    public String getMPN() {
+        String mpn = fields.get(KEY_MPN);
+        return mpn;
     }
 
     @Override

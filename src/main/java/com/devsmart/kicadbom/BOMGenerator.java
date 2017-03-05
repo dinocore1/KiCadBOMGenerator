@@ -1,12 +1,18 @@
 package com.devsmart.kicadbom;
 
 
+import au.com.bytecode.opencsv.CSVWriter;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.TreeMultimap;
 import com.vseravno.solna.SolnaParser;
 import org.apache.commons.cli.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.util.Map;
+import java.util.NavigableSet;
+import java.util.Set;
 
 public class BOMGenerator {
 
@@ -26,6 +32,7 @@ public class BOMGenerator {
             CommandLine line = parser.parse(options, args);
 
             File inputXMLFile = new File(line.getOptionValue("i"));
+            File outputCSVFile = new File(line.getOptionValue("o", "BOM.csv"));
 
             ComponentsHandler componentsHandler = new ComponentsHandler();
             SolnaParser xmlParser = new SolnaParser();
@@ -35,6 +42,17 @@ public class BOMGenerator {
             xmlParser.parse(fin);
             fin.close();
 
+            ArrayListMultimap<String, Component> componentsByMPN = ArrayListMultimap.create();
+
+            for(Component c : componentsHandler.components) {
+                String mpn = c.getMPN();
+                if(mpn != null) {
+                    componentsByMPN.put(mpn, c);
+                }
+            }
+
+            BOMCSVWriter writer = new BOMCSVWriter(componentsByMPN, new FileOutputStream(outputCSVFile));
+            writer.write();
 
 
 

@@ -6,6 +6,16 @@ apply plugin: 'java'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.sf.proguard:proguard-gradle:5.2.1'
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -18,6 +28,34 @@ dependencies {
     compile 'com.google.guava:guava:19.0'
     compile 'com.google.code.gson:gson:2.6.2'
     compile 'com.vseravno.solna:solna:0.5.1'
+    compile 'au.com.bytecode:opencsv:2.4'
 
     testCompile 'junit:junit:4.12'
+}
+
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'KiCadBOM',
+                'Implementation-Version': version,
+                'Main-Class': 'com.devsmart.kicadbom.BOMGenerator'
+    }
+
+    baseName = 'KiCadBOM'
+    //from {
+    //  configurations.compile.collect {
+    //    it.isDirectory() ? it : zipTree(it)
+    //  }
+    //}
+
+}
+
+task proguard(type: proguard.gradle.ProGuardTask) {
+    configuration 'proguard.txt'
+
+    injars jar.outputs
+    injars files(configurations.compile.collect())
+    //libraryjars files(configurations.compile.collect())
+    outjars 'build/libs/kicadbom-proguard.jar'
+    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
 }
