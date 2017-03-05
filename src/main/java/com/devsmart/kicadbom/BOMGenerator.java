@@ -1,18 +1,14 @@
 package com.devsmart.kicadbom;
 
 
-import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.TreeMultimap;
 import com.vseravno.solna.SolnaParser;
 import org.apache.commons.cli.*;
 
-import java.io.*;
-import java.util.Map;
-import java.util.NavigableSet;
-import java.util.Set;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class BOMGenerator {
 
@@ -47,8 +43,11 @@ public class BOMGenerator {
             for(Component c : componentsHandler.components) {
                 String mpn = c.getMPN();
                 if(mpn != null) {
-                    componentsByMPN.put(mpn, c);
+                } else {
+                    mpn = String.format("*UKN* %s %s", c.ref, c.value);
                 }
+
+                componentsByMPN.put(mpn, c);
             }
 
             BOMCSVWriter writer = new BOMCSVWriter(componentsByMPN, new FileOutputStream(outputCSVFile));

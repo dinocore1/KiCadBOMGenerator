@@ -2,9 +2,13 @@ package com.devsmart.kicadbom;
 
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.io.Resources;
+import com.vseravno.solna.SolnaParser;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 
@@ -47,6 +51,33 @@ public class BOMWriterTest {
         BOMCSVWriter BOMWriter = new BOMCSVWriter(componentsByMPN, writer);
         BOMWriter.write();
 
+
+    }
+
+    @Test
+    public void testWriteExampleBOM() throws Exception {
+        InputStream in = Resources.getResource("GoGrow.xml").openStream();
+
+        ComponentsHandler handler = new ComponentsHandler();
+        SolnaParser xmlParser = new SolnaParser();
+        xmlParser.addHandler("/export/components/comp", handler);
+
+        xmlParser.parse(in);
+        in.close();
+
+        ArrayListMultimap<String, Component> componentsByMPN = ArrayListMultimap.create();
+
+        for(Component c : handler.components) {
+            String mpn = c.getMPN();
+            if(mpn != null) {
+                componentsByMPN.put(mpn, c);
+            }
+        }
+
+        StringWriter writer = new StringWriter();
+
+        BOMCSVWriter BOMwriter = new BOMCSVWriter(componentsByMPN, writer);
+        BOMwriter.write();
 
     }
 }
