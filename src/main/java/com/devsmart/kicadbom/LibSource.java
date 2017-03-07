@@ -3,6 +3,8 @@ package com.devsmart.kicadbom;
 
 public class LibSource {
 
+    public static final LibSource RESISTOR = new LibSource("device", "R");
+
 
     private final String lib;
     private final String part;

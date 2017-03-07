@@ -12,6 +12,10 @@ import java.io.IOException;
 
 public class BOMGenerator {
 
+    private static String findMatchingStandardPart(Component c) {
+        return null;
+    }
+
 
     public static void main(String[] args) {
 
@@ -42,8 +46,11 @@ public class BOMGenerator {
 
             for(Component c : componentsHandler.components) {
                 String mpn = c.getMPN();
-                if(mpn != null) {
-                } else {
+                if(mpn == null) {
+                    mpn = findMatchingStandardPart(c);
+                }
+
+                if(mpn == null) {
                     mpn = String.format("*UKN* %s %s", c.ref, c.value);
                 }
 

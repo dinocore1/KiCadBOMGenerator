@@ -47,6 +47,7 @@ public class ComponentsHandler implements SolnaHandler<Element> {
         final String ref = element.getAttribute("ref");
         Component c = new Component(ref);
         c.value = getElementValue("value", element);
+        c.footprint = getElementValue("footprint", element);
         loadFields(element.getElementsByTagName("fields").item(0), c);
         c.libSource = parseLibSource(element.getElementsByTagName("libsource").item(0));
 

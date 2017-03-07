@@ -9,9 +9,10 @@ public class Component {
     public static final String KEY_MPN = "MPN";
 
     public final String ref;
-    String value;
-    LibSource libSource;
-    Map<String, String> fields = new HashMap<String, String>();
+    public String value;
+    public String footprint;
+    public LibSource libSource;
+    public final Map<String, String> fields = new HashMap<String, String>();
 
 
     public Component(String ref) {
