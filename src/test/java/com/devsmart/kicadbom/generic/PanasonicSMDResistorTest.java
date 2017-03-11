@@ -40,6 +40,21 @@ public class PanasonicSMDResistorTest {
     }
 
     @Test
+    public void test0603_40R2K_5() {
+        PanasonicSMDResistor r = new PanasonicSMDResistor();
+
+        Component c = new Component("R1");
+        c.value = "40.2k";
+        c.footprint = "Resistors_SMD:R_0603";
+        c.libSource = LibSource.RESISTOR;
+
+        String mpn = r.getMPN(c);
+        assertNotNull(mpn);
+        assertEquals("ERJ3GEYJ393V", mpn);
+
+    }
+
+    @Test
     public void test0603_700_5() {
         PanasonicSMDResistor r = new PanasonicSMDResistor();
 

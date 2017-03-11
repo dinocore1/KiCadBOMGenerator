@@ -114,7 +114,22 @@ public class StandardValues {
         if(value < 1.0 || value > 10.0) {
             throw new NumberFormatException("value must be between 1 - 10");
         }
-        return (int) (e * Math.log10(value));
+
+        /**
+         * Since the E3 to E24 series were defined and established even before IEC 63, some of the values
+         * from 2.7 to 4.7 and 8.2 do not follow the rounding rules exactly, but weren't changed to avoid
+         * confusion.
+         * This should correct for that...
+         */
+        if(e >= 3 && e <= 24) {
+            if (value >= 2.7 && value <= 4.7) {
+                value -= 0.1;
+            }
+        }
+
+        double d = e * Math.log10(value);
+        int index = (int) Math.round(d);
+        return index;
     }
 
 
