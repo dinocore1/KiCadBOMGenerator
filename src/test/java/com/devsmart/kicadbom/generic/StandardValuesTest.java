@@ -9,6 +9,14 @@ import static org.junit.Assert.*;
 
 public class StandardValuesTest {
 
+    @Test
+    public void testQuanityParser() {
+        assertEquals(1000, StandardValues.parseValue("1k"), 0.0001);
+        assertEquals(330, StandardValues.parseValue("330"), 0.0001);
+        assertEquals(0.1e-6, StandardValues.parseValue("0.1uF"), 1e-10);
+
+    }
+
 
     @Test
     public void testStandardValues() {
