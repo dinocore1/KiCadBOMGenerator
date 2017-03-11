@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 public class StandardValues {
 
 
-    private static Pattern VALUE_REGEX = Pattern.compile("([0-9]+\\.?[0-9]*)([k|u|n|p|M])?");
+    private static Pattern VALUE_REGEX = Pattern.compile("([0-9]+\\.?[0-9]*)([k|u|n|p|M|m])?");
 
     public static double parseValue(String valueStr) throws NumberFormatException {
         Matcher m = VALUE_REGEX.matcher(valueStr);
@@ -36,6 +36,8 @@ public class StandardValues {
                 quanity *= 1e-12;
             } else if("M".equals(scale)) {
                 quanity *= 1e6;
+            } else if("m".equals(scale)) {
+                quanity *= 1e-3;
             }
         }
 
@@ -53,58 +55,61 @@ public class StandardValues {
         return retval;
     }
 
-    public static ImmutableList<String> E12;
-    public static ImmutableList<String> E24;
-    public static ImmutableList<String> E96;
+    public static ImmutableList<BigDecimal> E12;
+    public static ImmutableList<BigDecimal> E24;
+    public static ImmutableList<BigDecimal> E96;
 
     static {
-        E12 = ImmutableList.<String>builder()
-                .add("10")
-                .add("12")
-                .add("15")
-                .add("18")
-                .add("22")
-                .add("27")
-                .add("33")
-                .add("39")
-                .add("47")
-                .add("56")
-                .add("68")
-                .add("82")
+
+        MathContext mc = new MathContext(2, RoundingMode.HALF_DOWN);
+
+        E12 = ImmutableList.<BigDecimal>builder()
+                .add(new BigDecimal(10, mc))
+                .add(new BigDecimal(12, mc))
+                .add(new BigDecimal(15, mc))
+                .add(new BigDecimal(18, mc))
+                .add(new BigDecimal(22, mc))
+                .add(new BigDecimal(27, mc))
+                .add(new BigDecimal(33, mc))
+                .add(new BigDecimal(39, mc))
+                .add(new BigDecimal(47, mc))
+                .add(new BigDecimal(56, mc))
+                .add(new BigDecimal(68, mc))
+                .add(new BigDecimal(82, mc))
                 .build();
 
-        E24 = ImmutableList.<String>builder()
-                .add("10")
-                .add("11")
-                .add("12")
-                .add("13")
-                .add("15")
-                .add("16")
-                .add("18")
-                .add("20")
-                .add("22")
-                .add("24")
-                .add("27")
-                .add("30")
-                .add("33")
-                .add("36")
-                .add("39")
-                .add("43")
-                .add("47")
-                .add("51")
-                .add("56")
-                .add("62")
-                .add("68")
-                .add("75")
-                .add("82")
-                .add("91")
+        E24 = ImmutableList.<BigDecimal>builder()
+                .add(new BigDecimal(10, mc))
+                .add(new BigDecimal(11, mc))
+                .add(new BigDecimal(12, mc))
+                .add(new BigDecimal(13, mc))
+                .add(new BigDecimal(15, mc))
+                .add(new BigDecimal(16, mc))
+                .add(new BigDecimal(18, mc))
+                .add(new BigDecimal(20, mc))
+                .add(new BigDecimal(22, mc))
+                .add(new BigDecimal(24, mc))
+                .add(new BigDecimal(27, mc))
+                .add(new BigDecimal(30, mc))
+                .add(new BigDecimal(33, mc))
+                .add(new BigDecimal(36, mc))
+                .add(new BigDecimal(39, mc))
+                .add(new BigDecimal(43, mc))
+                .add(new BigDecimal(47, mc))
+                .add(new BigDecimal(51, mc))
+                .add(new BigDecimal(56, mc))
+                .add(new BigDecimal(62, mc))
+                .add(new BigDecimal(68, mc))
+                .add(new BigDecimal(75, mc))
+                .add(new BigDecimal(82, mc))
+                .add(new BigDecimal(91, mc))
                 .build();
 
-        ImmutableList.Builder<String> builder = ImmutableList.builder();
-        final MathContext mc = new MathContext(3, RoundingMode.HALF_DOWN);
+        ImmutableList.Builder<BigDecimal> builder = ImmutableList.builder();
+        mc = new MathContext(3, RoundingMode.HALF_DOWN);
         for(int i=0;i<96;i++){
             BigDecimal value = new BigDecimal(10*Math.pow(10, i/(double)96), mc);
-            builder.add(value.toPlainString());
+            builder.add(value);
         }
         E96 = builder.build();
 

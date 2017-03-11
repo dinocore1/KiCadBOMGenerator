@@ -67,4 +67,18 @@ public class PanasonicSMDResistorTest {
         assertNotNull(mpn);
         assertEquals("ERJ3GEYJ681V", mpn);
     }
+
+    @Test
+    public void test0603_4R7_5() {
+        PanasonicSMDResistor r = new PanasonicSMDResistor();
+
+        Component c = new Component("R1");
+        c.value = "4.7";
+        c.footprint = "Resistors_SMD:R_0603";
+        c.libSource = LibSource.RESISTOR;
+
+        String mpn = r.getMPN(c);
+        assertNotNull(mpn);
+        assertEquals("ERJ3GEYJ4R7V", mpn);
+    }
 }

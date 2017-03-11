@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,12 +18,12 @@ public class PanasonicSMDResistor implements GenericPartFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(PanasonicSMDResistor.class);
 
     private static final Pattern FOOTPRINT_SMD = Pattern.compile("Resistors_SMD:R_([0-9]+)");
-
-    private static final ImmutableMap<String, String> SIZEING_MAP_5P;
+    private static final ImmutableMap<String, String> SIZING_MAP_5P;
     private static final ImmutableMap<String, String> SIZING_MAP_1P;
     private static final Range<Double> VALUE_RANGE_5P;
+    private static final Range<Double> VALUE_RANGE_1P;
     static {
-        SIZEING_MAP_5P = ImmutableMap.<String, String>builder()
+        SIZING_MAP_5P = ImmutableMap.<String, String>builder()
                 .put("0201", "1GN")
                 .put("0402", "2GE")
                 .put("0603", "3GE")
@@ -44,12 +43,13 @@ public class PanasonicSMDResistor implements GenericPartFactory {
                 .put("0805", "6EN")
                 .put("1206", "8EN")
                 .build();
+
+        VALUE_RANGE_1P = Range.closed(10.0, 1000000.0);
     }
 
     @Override
     public String getMPN(Component c) {
         Matcher m;
-        String footprintCode;
 
         try {
 
@@ -57,30 +57,64 @@ public class PanasonicSMDResistor implements GenericPartFactory {
                 LibSource.RESISTOR.equals(c.libSource) &&
                 c.footprint != null &&
                 c.value != null &&
-                (m = FOOTPRINT_SMD.matcher(c.footprint)).find() &&
-                (footprintCode = SIZEING_MAP_5P.get(m.group(1))) != null) {
+                (m = FOOTPRINT_SMD.matcher(c.footprint)).find()) {
+
+            final String footprintSize = m.group(1);
+            String footprintCode;
 
             double value = StandardValues.parseValue(c.value);
-
             double decade = Math.floor(Math.log10(value));
 
             String tolerance = c.fields.get("tolerance");
-            if(tolerance != null && "1%".equals(tolerance)) {
-                double normalValue = value / Math.pow(10, decade);
-                String stdValue = StandardValues.E96.get(StandardValues.getIndexEIAStandard(normalValue, 96));
+            if(tolerance == null) {
+                LOGGER.warn("no tolerance specified for: " + c.ref + " assuming 5%");
+                tolerance = "5%";
+            }
 
-                return "ERJ" + footprintCode + "F" + stdValue + (((int)decade) - 1) + "V";
-            } else {
-                //5%
+            if("1%".equals(tolerance)) {
+
+                if((footprintCode = SIZING_MAP_1P.get(footprintSize)) == null){
+                    throw new Exception("no matching footprint code: " + footprintSize);
+                }
+
+                if(!VALUE_RANGE_1P.contains(value)) {
+                    throw new Exception("value: " + value + " not in range: " + VALUE_RANGE_1P);
+                }
+
+                double normalValue = value / Math.pow(10, decade);
+                BigDecimal stdValue = StandardValues.E96.get(StandardValues.getIndexEIAStandard(normalValue, 96));
+                String valueCode = stdValue.toPlainString();
+
+                if(value < 10) {
+                    valueCode = "" + valueCode.charAt(0) + 'R' + valueCode.charAt(1);
+                } else {
+                    valueCode += "" + (((int)decade) - 1);
+                }
+
+                return "ERJ" + footprintCode + "F" + valueCode + "V";
+
+
+            } else if("5%".equals(tolerance)){
+
+                if((footprintCode = SIZING_MAP_5P.get(footprintSize)) == null){
+                    throw new Exception("no matching footprint code: " + footprintSize);
+                }
 
                 if(!VALUE_RANGE_5P.contains(value)) {
                     throw new Exception("value: " + value + " not in range: " + VALUE_RANGE_5P);
                 }
 
                 double normalValue = value / Math.pow(10, decade);
-                String stdValue = StandardValues.E24.get(StandardValues.getIndexEIAStandard(normalValue, 24));
+                BigDecimal stdValue = StandardValues.E24.get(StandardValues.getIndexEIAStandard(normalValue, 24));
+                String valueCode = stdValue.toPlainString();
 
-                return "ERJ" + footprintCode + "YJ" + stdValue + (((int)decade) - 1) + "V";
+                if(value < 10) {
+                    valueCode = "" + valueCode.charAt(0) + 'R' + valueCode.charAt(1);
+                } else {
+                    valueCode += "" + (((int)decade) - 1);
+                }
+
+                return "ERJ" + footprintCode + "YJ" + valueCode + "V";
             }
 
         }
