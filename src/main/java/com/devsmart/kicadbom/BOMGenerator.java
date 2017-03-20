@@ -1,7 +1,9 @@
 package com.devsmart.kicadbom;
 
 
+import com.devsmart.kicadbom.generic.PanasonicSMDResistor;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableList;
 import com.vseravno.solna.SolnaParser;
 import org.apache.commons.cli.*;
 
@@ -12,7 +14,22 @@ import java.io.IOException;
 
 public class BOMGenerator {
 
+    private static final ImmutableList<GenericPartFactory> GENERIC_PART_FACTORIES;
+
+    static {
+        GENERIC_PART_FACTORIES = new ImmutableList.Builder<GenericPartFactory>()
+                .add(new PanasonicSMDResistor())
+                .build();
+    }
+
     private static String findMatchingStandardPart(Component c) {
+        String retval = null;
+
+        for(GenericPartFactory partFactory : GENERIC_PART_FACTORIES) {
+            if((retval = partFactory.getMPN(c)) != null) {
+                return retval;
+            }
+        }
         return null;
     }
 
