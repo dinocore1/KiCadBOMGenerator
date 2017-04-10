@@ -84,11 +84,24 @@ public class PanasonicSMDResistor implements GenericPartFactory {
                 double normalValue = value / Math.pow(10, decade);
                 BigDecimal stdValue = StandardValues.E96.get(StandardValues.getIndexEIAStandard(normalValue, 96));
                 String valueCode = stdValue.toPlainString();
+                if(value > 100) {
+                    valueCode = valueCode.replace(".", "");
+                    if(valueCode.length() <= 2) {
+                        valueCode += "0";
+                    }
 
-                if(value < 10) {
-                    valueCode = "" + valueCode.charAt(0) + 'R' + valueCode.charAt(1);
+                } else if(value > 10) {
+                    valueCode = valueCode.replace(".", "R");
+                    if(valueCode.length() <= 2) {
+                        valueCode += "0";
+                    }
+
                 } else {
-                    valueCode += "" + (((int)decade) - 1);
+                    valueCode = "10R0";
+                }
+
+                if(valueCode.length() < 4) {
+                    valueCode += "" + (((int)decade) - 2);
                 }
 
                 return "ERJ" + footprintCode + "F" + valueCode + "V";
